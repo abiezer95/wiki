@@ -83,7 +83,7 @@ class MainHandler(Handler):
         #self.write(check_user(user))
         ##
         #self.write(pword)
-        self.redirect("/token=reg?username="+user+"&pword="+self.salts()+"&name="+name+"&n=1")
+        self.redirect("/token=reg?username="+user+"&pword="+pword+"&name="+name+"&n=1")
 
       else:
         self.redirect("/token=login")
