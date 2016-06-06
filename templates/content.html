@@ -1,0 +1,54 @@
+{% extends "proyecto.html" %}
+{% block content %}
+<script>
+	$(document).ready(function(){
+
+	})
+</script>
+<div id="logo">
+		<h1>Trabajo final <img src="css/1.png"></h1>
+		<div>
+		<b onclick="edit()" class="edit">Mostrar Edit |</b>
+		{% if n==0 %} 
+			<b onclick="login()">login</b>
+			<b onclick="reg()">Registrarse</b>
+		{% else %}
+			<b>{{user}} - </b>
+			<a href="logout" style="color:red;"><b>Logout</b></a>
+		{% endif %}
+		</div>
+	</div>
+	<center class="content">
+		<b style="opacity:0.8;font-size:25px;font-weight:lighter;text-decoration:underline;">Publicaciones</b>
+	</center>
+
+<center id="feed">
+<hr>
+{% for texto in datos %}
+	<b>{{texto.nombre}}</b>
+	<hr>
+{% endfor %}
+{{reg}}
+</center>
+
+	<div class="login">
+<form method="post">
+	<input type="text" name="user" placeholder="Username" required><br><br>
+	<input type="password" name="pass" placeholder="••••••••" required>
+	<button>Entrar</button>
+	
+</form><button onclick="cerrar()">Cancelar</button>
+	</div>
+
+
+	<div class="registrar">
+<form method="post">
+	<input type="text" name="userreg" placeholder="Username" required><br><br>
+	<input type="password" name="passreg" placeholder="••••••••" required><br><br>
+	<input type="text" name="nombre" placeholder="Nombre completo" required>
+	<button>Registrarme</button>
+
+</form><button onclick="cerrar()">Cancelar</button>
+	</div>
+	{{reguser}}
+{% endblock %}

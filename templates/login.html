@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Welcome to Wiki-Time</title>
+	<meta charset="utf-8">
+	<style>
+	*{padding: 0;margin:0;}
+	 	body{background:#EFFBFB}
+	 	#center{width:350px;height:100px;background:#01DFA5;box-shadow:0px 0px 20px rgba(0,0,0,0.3);border-radius:10px;position:relative;top:200px;}
+	 	h3{color:#000;font-weight: lighter;position:relative;top:180px;}
+	 	#center button{position:relative;top:30px;background:#FF0080;border:0;border-radius:5px;width:150px;height:35px;font-size:17px;font-weight: lighter;color:#fff;box-shadow:0px 0px 20px rgba(0,0,0,0.3);opacity:;cursor: pointer;}
+	 	.logo{position:fixed;top:0;background:#fff;box-shadow:0px 0px 20px rgba(0,0,0,0.3);width:99.9%;height:50px;}
+	 	.logo h2{position:absolute;top:10px;left:10px;opacity:0.7}
+	 	.logo a{position:absolute;right:20px;top:15px;text-decoration:none;color:#01DFA5;}
+	 	.logo a:hover{text-decoration:underline;}
+
+	 	.footer{position: relative;top:300px;opacity:0.5}
+	</style>
+</head>
+<body>
+<div class="logo">
+	<h2>Wiki-Time</h2>
+	<a href="logout">-Logout</a>
+</div>
+<center><h3>Bienvenido {{name}}</h3></center>
+<center>
+	<div id="center">
+		<a href="/"><button>Continuar</button></a>
+	</div>
+</center>
+<center class="footer">
+	<p>Te acabas de registrar a wiki-time, da click en continuar para empezar tu nueva experiencia.</p>
+</center>
+</body>
+</html>

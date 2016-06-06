@@ -1,0 +1,29 @@
+*{padding: 0;margin:0;}
+
+
+body{background: }
+#logo{position:fixed;top:0;background:#01DFA5;width:99.9%;height:50px;}
+#logo h1{position: absolute;left:10px;top:10px;font-size:25px;color:#fff;cursor:pointer;}
+#logo h1 img{width:20px;}
+#logo div{position: absolute;right:20px;}
+#logo div b{position: relative;margin-right:5px;top:15px;font-size:18px;font-weight: lighter;color:;opacity: 0.9;cursor: pointer;}
+#logo div b:hover{text-decoration:underline;}
+
+.login{position:absolute;top:50px;right:0px;width:300px;height:180px;background:#fff;box-shadow: 0px 0px 20px rgba(0,0,0,0.5);border-radius:10px}
+.login input{position: relative;top:20px;left:10px;width:250px;height:30px;font-size:16px}
+
+.login button{position: relative;top:50px;width:100px;height: 30px;left:30px;float:left;margin-left:10px}
+
+
+.registrar{position:absolute;top:50px;right:0px;width:300px;height:210px;background:#fff;box-shadow: 0px 0px 20px rgba(0,0,0,0.5);border-radius:10px}
+.registrar input{position: relative;top:20px;left:10px;width:250px;height:25px;font-size:14px}
+
+.registrar button{position: relative;top:50px;width:100px;height: 30px;left:30px;float:left;margin-left:10px}
+
+.content{position:relative;top:150px;}
+textarea{font-size:18px;text-indent: 5px}
+.content button{width:100px;height:30px;font-size: 16px;font-weight: lighter;opacity:0.8}
+.content h2{opacity: 0.7}
+
+#feed{position:relative;top:200px;}
+#feed b{font-size:18px;font-weight: lighter;}
