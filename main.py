@@ -5,7 +5,7 @@ import re
 #conectando a la base de datos 
 from google.appengine.ext import db
 from imports import hashear
-
+#cambio de linea
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir))
 ##
