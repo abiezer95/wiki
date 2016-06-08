@@ -1,7 +1,6 @@
 import os
 import jinja2
 import webapp2
-
 #conectando a la base de datos 
 from google.appengine.ext import db
 from imports import hashear
@@ -21,36 +20,39 @@ class Handler(webapp2.RequestHandler):
     self.write(self.render_str(template, **kw))
 
 #clase database
-class Db(db.Model):
+class Db2(db.Model):
       #texto=db.StringProperty(required = True)
       fecha=db.DateTimeProperty(auto_now_add = True)
-      nombre=db.StringProperty(required = False)
-      reguser=db.StringProperty(required = True)
-      regpass=db.StringProperty(required = True) 
-      
-class MainHandler(Handler):
-  #body de html
-    def validar(self, user, pword):
-      datos= db.GqlQuery("SELECT * FROM Db " "ORDER BY fecha DESC") 
+      name=db.StringProperty(required = False)
+      user=db.StringProperty(required = True)
+      pword=db.StringProperty(required = True) 
 
-      ps=self.get_cookies("ps")
-      us=self.get_cookies("us")
-    #       #
-      secret=self.start_secret(user)
-      ps=self.check_secure_val(ps)
-      if secret==us and ps==pword:
-        return self.render("content.html", datos=datos, user=user.title(), n=1)
-      else:
-        return self.render("errorlog.html")
-      
+class MainHandler(Handler):
+  #body de html      
+    def datos(self):
+      return db.GqlQuery("SELECT * FROM Db2 " 
+                          "ORDER BY fecha DESC")
     def get(self):
-        datos= db.GqlQuery("SELECT * FROM Db " "ORDER BY fecha DESC") 
-        pword=self.get_cookies("pw")
-        user=self.get_cookies("user")
-        if pword and user:
-          self.validar(user, pword)
-        else:
-          self.render("content.html", datos=datos, n=0)
+        data=self.datos()
+        user=self.validar()
+        self.render("content.html", data=data, user=user)
+        #db.delete(Db2.all(keys_only=True))
+
+    def validar(self):
+      a=self.get_cookies("user_id")
+      a=self.check_secure_val(a)
+      for d in self.datos():
+        s=str(d.key().id())
+        if s==a:
+          return d.user
+          break
+
+    def reg(self, pword, name, user):
+        add=self.add_cookies("user_id", self.make_secure_val(Session().create_session(pword, name, user)))
+        self.redirect("/token=reg?username="+user+"&name="+name+"&n=1")
+      
+    def log(self):
+      pass
 
     def add_cookies(self, name, clave):
         self.response.headers.add_header("Set-Cookie", "%s=%s; Path=/" %(name, clave))
@@ -58,8 +60,11 @@ class MainHandler(Handler):
     def hash_keys(self, user):
       return hashear.hash(user)
     
-    def check_secure_val(self, user):
+    def make_secure_val(self, user):
       return hashear.make_secure_val(user)
+    
+    def check_secure_val(self, user):
+      return hashear.check_secure_val(user)
     
     def secret(self, user):
       return hashear.hmacc(user)
@@ -73,39 +78,56 @@ class MainHandler(Handler):
     def getP(self, post):
       return self.request.get(post)
 
+
     def post(self):
       user=self.getP("userreg")
       pword=self.getP("passreg")
       name=self.getP("nombre")
-    ##              ##
       if user and pword and name:
-        salt=self.salts()
-        pword=self.start_check(pword, user)
-        ##
-        #self.write(pword)
-        self.redirect("/token=reg?username="+user+"&pword="+salt+"&name="+name+"&n=1")
-
+        self.reg(pword, name, user)
       else:
-        self.redirect("/token=login")
+        pass
 
     def start_secret(self, pword):
       pword=self.hash_keys(pword)
       pword=self.secret(pword)
       return pword 
-    
-    def start_check(self, pword, user):
-      pword=self.start_secret(pword)
-      pword=pword+self.salts()
-      self.add_cookies("ps", pword)
-      pword=self.check_secure_val(pword)
-      self.add_cookies("pw", pword)
-      user=str(user)
-      us=self.start_secret(user)
-      self.add_cookies("user", user)
-      self.add_cookies("us", us)
+
+class Session(MainHandler):
+  def create_session(self, pword, name, user):
+      pword=self.hash_keys(pword)
+      a=Db2(name = name, user = user, pword = pword)
+      a.put()
+      pword=str(a.key().id())
       return pword
 
-      #aqui le agregamos el objeto con la informacion
+  def validar(self, c):
+    pass
+
+class Reg(Handler):
+  def get(self):
+    user = self.request.get("username")
+    pword = self.request.get("pword")
+    name=self.request.get("name").title()
+    self.render("login.html", name=name)
+
+class Login(Handler):
+  def get(self):
+    self.write(self.user)
+
+class Logout(MainHandler):
+  def get(self):
+    self.add_cookies("user_id", " ")
+    self.redirect("/")
+
+app = webapp2.WSGIApplication([
+    ('/', MainHandler),
+    ('/token=reg', Reg),
+    ('/token=login', Login), 
+    ('/logout', Logout)
+], debug=True)
+
+ #aqui le agregamos el objeto con la informacion
       #datos= db.GqlQuery("SELECT * FROM Db " "ORDER BY fecha DESC")
       #reg={}
        #  for data in datos:
@@ -120,28 +142,3 @@ class MainHandler(Handler):
       #       self.render("content.html", login=1)
       #else:        
       # self.render("content.html", login=0)
-class Reg(Handler):
-  def get(self):
-    user = self.request.get("username")
-    pword = self.request.get("pword")
-    name=self.request.get("name").title()
-    self.render("login.html", name=name)
-
-class Login(Handler):
-  def get(self):
-    self.write(self.user)
-
-class Logout(MainHandler):
-  def get(self):
-    self.add_cookies("ps", " ")
-    self.add_cookies("user", " ")
-    self.add_cookies("us", " ")
-    self.add_cookies("pw", " ")
-    self.redirect("/")
-
-app = webapp2.WSGIApplication([
-    ('/', MainHandler),
-    ('/token=reg', Reg),
-    ('/token=login', Login), 
-    ('/logout', Logout)
-], debug=True)

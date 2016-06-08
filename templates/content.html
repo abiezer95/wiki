@@ -11,7 +11,7 @@
 		<h1>Wiki Time <img src="css/1.png"></h1>
 		<div>
 		<b onclick="edit()" class="edit">Mostrar Edit |</b>
-		{% if n==0 %} 
+		{% if user==None %} 
 			<b onclick="login()">login</b>
 			<b onclick="reg()">Registrarse</b>
 		{% else %}
@@ -26,11 +26,10 @@
 
 <center id="feed">
 <hr>
-{% for texto in datos %}
-	<b>{{texto.nombre}}</b>
+{% for texto in data %}
+	<b>{{texto.name}}</b>
 	<hr>
 {% endfor %}
-{{reg}}
 </center>
 
 	<div class="login">
@@ -55,5 +54,4 @@
 	<footer>
 		<center><h3>Trabajo final de udacity - Intellisys</h3></center>
 	</footer>
-	{{reguser}}
 {% endblock %}
