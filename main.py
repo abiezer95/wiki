@@ -40,19 +40,26 @@ class MainHandler(Handler):
 
     def validar(self):
       a=self.get_cookies("user_id")
-      a=self.check_secure_val(a)
-      for d in self.datos():
-        s=str(d.key().id())
-        if s==a:
-          return d.user
-          break
+      if a:
+        a=self.check_secure_val(a)
+        for d in self.datos():
+          s=str(d.key().id())
+          if s==a:
+            return d.user.title()
+            break
 
     def reg(self, pword, name, user):
         add=self.add_cookies("user_id", self.make_secure_val(Session().create_session(pword, name, user)))
         self.redirect("/token=reg?username="+user+"&name="+name+"&n=1")
       
-    def log(self):
-      pass
+    def log(self, user, pword):
+      ps=self.start_secret(pword) 
+      f=Db2.all().filter('user = ', user).get()
+      p=str(f.pword)
+      if ps==p:
+        p=self.make_secure_val(str(f.key().id()))
+        self.add_cookies("user_id", p)
+        self.redirect("/")
 
     def add_cookies(self, name, clave):
         self.response.headers.add_header("Set-Cookie", "%s=%s; Path=/" %(name, clave))
@@ -86,7 +93,9 @@ class MainHandler(Handler):
       if user and pword and name:
         self.reg(pword, name, user)
       else:
-        pass
+        user=self.getP("user")
+        pword=self.getP("pass") 
+        self.log(user, pword)
 
     def start_secret(self, pword):
       pword=self.hash_keys(pword)
@@ -95,14 +104,11 @@ class MainHandler(Handler):
 
 class Session(MainHandler):
   def create_session(self, pword, name, user):
-      pword=self.hash_keys(pword)
+      pword=self.start_secret(pword)
       a=Db2(name = name, user = user, pword = pword)
       a.put()
       pword=str(a.key().id())
       return pword
-
-  def validar(self, c):
-    pass
 
 class Reg(Handler):
   def get(self):

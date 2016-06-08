@@ -5,14 +5,12 @@
 
 	})
 </script>
-<div class="fuego1"><img src="css/fuego.png"></div>
-<div class="fuego2"><img src="css/fuego.png"></div>
 <div id="logo">
 		<h1>Wiki Time <img src="css/1.png"></h1>
 		<div>
 		<b onclick="edit()" class="edit">Mostrar Edit |</b>
 		{% if user==None %} 
-			<b onclick="login()">login</b>
+			<b onclick="login()">login -</b>
 			<b onclick="reg()">Registrarse</b>
 		{% else %}
 			<b>{{user}} - </b>
@@ -20,14 +18,21 @@
 		{% endif %}
 		</div>
 	</div>
+
 	<center class="content">
-		<b style="opacity:0.8;font-size:25px;font-weight:lighter;text-decoration:underline;">Publicaciones</b>
+	{% if user!=None %} 
+		<h2>Haz un post</h2><form method="post" ><textarea placeholder="Escribe tu articulo aqui" name="text" id="limpiar" required></textarea><br><br><button>Postear</button></form><br><button  onclick='$("#limpiar").val("");$("#limpiar").focus();'>Limpiar todo</button>
+	{% else %}
+		<h2>No puedes publicar</h2>
+		<p>inicia sesion para hacerlo</p>
+	{% endif %}
 	</center>
 
 <center id="feed">
+<b style="opacity:0.8;font-size:25px;font-weight:lighter;">Publicaciones</b>
 <hr>
 {% for texto in data %}
-	<b>{{texto.name}}</b>
+	<b>{{texto.fecha}}</b>
 	<hr>
 {% endfor %}
 </center>
