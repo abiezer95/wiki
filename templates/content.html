@@ -1,27 +1,9 @@
 {% extends "proyecto.html" %}
 {% block content %}
-<script>
-	$(document).ready(function(){
-
-	})
-</script>
-<div id="logo">
-		<h1>Wiki Time <img src="css/1.png"></h1>
-		<div>
-		<b onclick="edit()" class="edit">Mostrar Edit |</b>
-		{% if user==None %} 
-			<b onclick="login()">login -</b>
-			<b onclick="reg()">Registrarse</b>
-		{% else %}
-			<b>{{user}} - </b>
-			<a href="logout" style="color:red;"><b>Logout</b></a>
-		{% endif %}
-		</div>
-	</div>
-
+<div id="content2">
 	<center class="content">
 	{% if user!=None %} 
-		<h2>Haz un post</h2><form method="post" ><textarea placeholder="Escribe tu articulo aqui" name="text" id="limpiar" required></textarea><br><br><button>Postear</button></form><br><button  onclick='$("#limpiar").val("");$("#limpiar").focus();'>Limpiar todo</button>
+		<h2>Haz un post</h2><form method="post"><textarea placeholder="Escribe tu articulo aqui" name="text" id="limpiar" required></textarea><input type="hidden" name="user" value={{user}}><br><br><button>Postear</button></form><br><button  onclick='$("#limpiar").val("");$("#limpiar").focus();'>Limpiar todo</button>
 	{% else %}
 		<h2>No puedes publicar</h2>
 		<p>inicia sesion para hacerlo</p>
@@ -32,7 +14,7 @@
 <b style="opacity:0.8;font-size:25px;font-weight:lighter;">Publicaciones</b>
 <hr>
 {% for texto in data %}
-	<b>{{texto.fecha}}</b>
+	<b onclick="var p='{{texto.text}}';var user='{{texto.user2}}';pub(p, user);">{{texto.fecha}} - {{texto.user2}}</b>
 	<hr>
 {% endfor %}
 </center>
@@ -56,7 +38,24 @@
 
 </form><button onclick="cerrar()">Cancelar</button>
 	</div>
+</div>
+<div id="logo">
+		<h1>Wiki Time <img src="css/1.png"></h1>
+		<div>
+		<b onclick="edit()" class="edit">Mostrar Edit |</b>
+		{% if user==None %} 
+			<b onclick="login()">login -</b>
+			<b onclick="reg()">Registrarse</b>
+		{% else %}
+			<b>{{user}} - </b>
+			<a href="logout" style="color:red;"><b>Logout</b></a>
+		{% endif %}
+		</div>
+	</div>
 	<footer>
 		<center><h3>Trabajo final de udacity - Intellisys</h3></center>
 	</footer>
+
+<div id="content" onclick="cerrar()"></div>
+<div class="load"></div>
 {% endblock %}

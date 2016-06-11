@@ -1,9 +1,13 @@
 import os
 import jinja2
 import webapp2
+import sys
+from urllib import quote
 #conectando a la base de datos 
 from google.appengine.ext import db
 from imports import hashear
+reload(sys)  
+sys.setdefaultencoding('utf-8')
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir))
@@ -32,10 +36,14 @@ class MainHandler(Handler):
     def datos(self):
       return db.GqlQuery("SELECT * FROM Db2 " 
                           "ORDER BY fecha DESC")
+    def datos2(self):
+      return db.GqlQuery("SELECT * FROM Db1 " 
+                          "ORDER BY fecha DESC")
     def get(self):
         data=self.datos()
+        data2=self.datos2()
         user=self.validar()
-        self.render("content.html", data=data, user=user)
+        self.render("content.html", data=data2, user=user)
         #db.delete(Db2.all(keys_only=True))
 
     def validar(self):
@@ -90,12 +98,22 @@ class MainHandler(Handler):
       user=self.getP("userreg")
       pword=self.getP("passreg")
       name=self.getP("nombre")
+      pub=self.getP("text")
       if user and pword and name:
         self.reg(pword, name, user)
+      elif pub:
+        self.postt(pub)
       else:
         user=self.getP("user")
         pword=self.getP("pass") 
         self.log(user, pword)
+
+    def postt(self, pub):
+      user=self.request.get("user")
+      #self.write(pub)
+      r=Db1(text = pub, user2=user)
+      r.put()
+      self.redirect("pub")
 
     def start_secret(self, pword):
       pword=self.hash_keys(pword)
@@ -126,25 +144,20 @@ class Logout(MainHandler):
     self.add_cookies("user_id", " ")
     self.redirect("/")
 
+class Db1(db.Model):
+  fecha=db.DateTimeProperty(auto_now_add = True)
+  text=db.StringProperty(required=True)
+  user2=db.StringProperty(required = False)
+
+class Pub(Handler):
+  def get(self):
+    self.render("loading.html")
+
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/token=reg', Reg),
     ('/token=login', Login), 
-    ('/logout', Logout)
+    ('/logout', Logout),
+    ('/pub', Pub)
 ], debug=True)
-
- #aqui le agregamos el objeto con la informacion
-      #datos= db.GqlQuery("SELECT * FROM Db " "ORDER BY fecha DESC")
-      #reg={}
-       #  for data in datos:
-        #reg[data.reguser]=[data.regpass]
-      #self.write(reg)
-      #user=self.request.get("user")
-      #password=self.request.get("pass")
-      #if user and password:
-      # for r in reg:
-      #   if user==r:
-      #     if password==reg[r][0]:
-      #       self.render("content.html", login=1)
-      #else:        
-      # self.render("content.html", login=0)
