@@ -16,9 +16,9 @@
 {% for texto in data %}
 	<b onclick="var p='{{texto.text}}';var user='{{texto.user2}}';pub(p, user);">{{texto.fecha}} - {{texto.user2}}</b>
 	<hr>
+	
 {% endfor %}
 </center>
-
 	<div class="login">
 <form method="post">
 	<input type="text" name="user" placeholder="Username" required><br><br>
@@ -38,8 +38,7 @@
 
 </form><button onclick="cerrar()">Cancelar</button>
 	</div>
-</div>
-<div id="logo">
+	<div id="logo">
 		<h1>Wiki Time <img src="css/1.png"></h1>
 		<div>
 		<b onclick="edit()" class="edit">Mostrar Edit |</b>
@@ -52,6 +51,7 @@
 		{% endif %}
 		</div>
 	</div>
+</div>
 	<footer>
 		<center><h3>Trabajo final de udacity - Intellisys</h3></center>
 	</footer>

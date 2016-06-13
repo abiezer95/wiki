@@ -40,3 +40,13 @@ hr{opacity:0.8}
 
 footer{position:fixed;bottom:1px;width:99.9%;height:50px;background:#f2f2f2;color:#000;}
 footer h3{opacity:0.8;font-family: 'Indie Flower', cursive;}
+
+@media only screen and (max-width:1000px){
+	#feed{position:absolute;top:500px;left:30%;}
+	.content{position:absolute;left:20%;}
+}@media only screen and (max-width:800px){
+	#feed{position:absolute;top:500px;left:20%;}
+	textarea{width:350px;}
+	.content{position:absolute;left:10%;}
+	#logo div{right:50px;}
+}
