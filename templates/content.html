@@ -14,7 +14,7 @@
 <b style="opacity:0.8;font-size:25px;font-weight:lighter;">Publicaciones</b>
 <hr>
 {% for texto in data %}
-	<b onclick="var p='{{texto.text}}';var user='{{texto.user2}}';pub(p, user);">{{texto.fecha}} - {{texto.user2}} - {{texto.urll}}</b>
+	<b onclick="var p='{{texto.text}}';var id='{{texto.pub2}}';var user='{{texto.user2}}';pub(p, user, id);">{{texto.fecha}} - {{texto.user2}} - {{texto.urll}}</b>
 	<hr>
 
 {% endfor %}
@@ -58,4 +58,20 @@
 
 <div id="content" onclick="cerrar()"></div>
 <div class="load"></div>
+<div class="comment">
+	<b>-Comentarios</b>
+	<form method="post">
+		<textarea name="comentar" placeholder="Comentar ..."></textarea>
+		<input type="hidden" class="id" name="id">
+		<button>Comentar</button>
+		<hr class="hr">
+		<center>
+			{% for c in comment %}
+			<section>
+				{{c.text}}<br><tt> - Publicado por {{c.user}} -</tt><hr>
+			</section>
+			{% endfor %}
+		</center>
+	</form>
+</div>
 {% endblock %}

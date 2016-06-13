@@ -3,20 +3,24 @@ $(document).ready(function(){
 	$(".registrar").css("display", "none");
 	$("#content").css("display", "none");
 	$(".load").css("display", "none");
+	$(".comment").css("display", "none");
 });
 
-function pub(p, user){
+function pub(p, user, id){
 	$("#content2").css({"-webkit-filter": "blur(3px)", "filter": "blur(3px)"}),
 	$("#content").css("display", "block"),
-	$(".load").css({"display": "block", "width": "400px", "height": "50px"}),
+	$(".load").css({"display": "block", "width": "400px", "height": "50px","left": "35%"}),
 	$(".load").html("<center><img src='/images/loading.gif' width='50'></center>");
+	$(".id").val("")
 p=p.replace("\n", "")
 var pub="<br><center><h3>Publicacion hecha por "+user+"</h3><hr><br><b>"+p+"</b><br><button onclick='cerrar()'>Cerrar</button></center>";
 var inter=setInterval(function(){
-		$(".load").css({"width": "500px", "height": "400px"}),
+		$(".load").css({"width": "500px", "height": "400px", "left": "15%"}),
+		$(".comment").css({"display": "block", "width": "400px", "height": "500px"}),
 		$(".load").html(pub);
+		$(".id").val(id)
 		clearInterval(inter);
-	},2500);
+	},2000);
 }
 
 function reg(){
@@ -33,6 +37,7 @@ function cerrar(){
 	$(".registrar").hide("fast")
 	$("#content").css("display", "none");
 	$(".load").css("display", "none");
+	$(".comment").css("display", "none");
 }
 var i=0;
 function edit(){

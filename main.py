@@ -24,6 +24,19 @@ class Handler(webapp2.RequestHandler):
     self.write(self.render_str(template, **kw))
 
 #clase database
+class Db1(db.Model):
+  fecha=db.DateTimeProperty(auto_now_add = True)
+  text=db.TextProperty(required=True)
+  user2=db.StringProperty(required = False)
+  urll=db.StringProperty(required = False)
+  pub2=db.StringProperty(required = False)
+
+class Comment(db.Model):
+  fecha=db.DateTimeProperty(auto_now_add = True)
+  text=db.TextProperty(required = True)
+  user=db.TextProperty(required = False)
+  n=db.TextProperty(required = True)
+
 class Db2(db.Model):
       #texto=db.StringProperty(required = True)
       fecha=db.DateTimeProperty(auto_now_add = True)
@@ -39,11 +52,15 @@ class MainHandler(Handler):
     def datos2(self):
       return db.GqlQuery("SELECT * FROM Db1 "
                           "ORDER BY fecha DESC")
+    def datos3(self):
+      return db.GqlQuery("SELECT * FROM Comment "
+                          "ORDER BY fecha DESC")
     def get(self):
         data2=self.datos2()
+        data3=self.datos3()
         user=self.validar()
-        self.render("content.html", data=data2, user=user)
-        #db.delete(d1.all(keys_only=True))
+        self.render("content.html", data=data2, comment=data3, user=user)
+        #db.delete(Db1.all(keys_only=True))
 
     def validar(self):
       a=self.get_cookies("user_id")
@@ -91,7 +108,7 @@ class MainHandler(Handler):
       return hashear.hmacc(user)
         ##
     def salts(self):
-      return hashear.make_salt(10)
+      return hashear.make_salt(15)
 
     def get_cookies(self, c):
       return self.request.cookies.get(c)
@@ -105,19 +122,31 @@ class MainHandler(Handler):
       pword=self.getP("passreg")
       name=self.getP("nombre")
       pub=self.getP("text")
+      c=self.getP("comentar")
       if user and pword and name:
         self.reg(pword, name, user)
       elif pub:
         self.postt(pub)
+      elif c:
+        self.commentar(c)
       else:
         user=self.getP("user")
         pword=self.getP("pass")
         self.log(user, pword)
 
+    def commentar(self, c):
+      n=self.getP("id")
+      user=self.validar()
+      r=Comment(text=c, n=n, user=user)
+      r.put()
+      self.redirect("pub")
+
+
     def postt(self, pub):
       user=self.request.get("user")
       #self.write(pub)
-      r=Db1(text = pub, user2=user, urll="/000")
+      salt=self.salts()
+      r=Db1(text = pub, user2=user, urll="/000", pub2=salt)
       r.put()
       self.redirect("pub")
 
@@ -150,12 +179,6 @@ class Logout(MainHandler):
     self.add_cookies("user_id", " ")
     self.redirect("/")
 
-class Db1(db.Model):
-  fecha=db.DateTimeProperty(auto_now_add = True)
-  text=db.TextProperty(required=True)
-  user2=db.StringProperty(required = False)
-  urll=db.StringProperty(required = False)
-
 class Pub(Handler):
   def get(self):
     self.render("loading.html")
@@ -179,6 +202,18 @@ class Url(MainHandler):
   d.put()
   self.render("loading2.html")
 
+class Json(MainHandler):
+  def get(self):
+    data3=self.datos3()
+    data2=self.datos2()
+    a={}
+    for d in data2:
+      for d2 in data3:
+        a[d.pub2]=" "
+        if d.pub2==d2.n:
+          a[d.pub2]=d2.text
+      self.write(str(a))
+
 url = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
 #esto me lee la url y permite los caracteres qe le mande
 app = webapp2.WSGIApplication([
@@ -187,5 +222,6 @@ app = webapp2.WSGIApplication([
     ('/token=login', Login),
     ('/logout', Logout),
     ('/pub', Pub),
-    (url, Url)
+    (url, Url),
+    ("/content/.json", Json)
 ], debug=True)
