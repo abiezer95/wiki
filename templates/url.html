@@ -1,0 +1,62 @@
+{% extends "proyecto.html" %}
+{% block content %}
+<div id="content2">
+    <center class="content">
+    {% if user!=None %}
+        <h2>Haz un post</h2><form method="post"><textarea placeholder="Escribe tu articulo aqui" name="text" id="limpiar" required></textarea><input type="hidden" name="user" value={{user}}><br><br><button>Postear</button></form><br><button  onclick='$("#limpiar").val("");$("#limpiar").focus();'>Limpiar todo</button>
+    {% else %}
+        <h2>No puedes publicar</h2>
+        <p>inicia sesion para hacerlo</p>
+    {% endif %}
+    </center>
+
+<center id="feed">
+<b style="opacity:0.8;font-size:25px;font-weight:lighter;">Publicaciones</b>
+<hr>
+{% for texto in data %}
+    {% if texto.urll==url %}
+        <b onclick="var p='{{texto.text}}';var user='{{texto.user2}}';pub(p, user);">{{texto.fecha}} - {{texto.user2}}</b>
+         <hr>
+    {% endif %}
+{% endfor %}
+</center>
+    <div class="login">
+<form method="post">
+    <input type="text" name="user" placeholder="Username" required><br><br>
+    <input type="password" name="pass" placeholder="••••••••" required>
+    <button>Entrar</button>
+
+</form><button onclick="cerrar()">Cancelar</button>
+    </div>
+
+
+    <div class="registrar">
+<form method="post">
+    <input type="text" name="userreg" placeholder="Username" required><br><br>
+    <input type="password" name="passreg" placeholder="••••••••" required><br><br>
+    <input type="text" name="nombre" placeholder="Nombre completo" required>
+    <button>Registrarme</button>
+
+</form><button onclick="cerrar()">Cancelar</button>
+    </div>
+    <div id="logo2">
+        <h1>Wiki Time <img src="css/1.png"></h1>
+        <div>
+        <b onclick="edit()" class="edit">Mostrar Edit |</b>
+        {% if user==None %}
+            <a href="/"><b onclick="login()">Inicio</b></a>
+        {% else %}
+            <b>{{user}} - </b>
+            <a href="/" style="color:red;"><b>Inicio</b></a>
+            <a href="logout" style="color:red;"><b>Logout</b></a>
+        {% endif %}
+        </div>
+    </div>
+</div>
+    <footer>
+        <center><h3>Trabajo final de udacity - Intellisys</h3></center>
+    </footer>
+
+<div id="content" onclick="cerrar()"></div>
+<div class="load"></div>
+{% endblock %}

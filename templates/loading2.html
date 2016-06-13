@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loading ...</title>
+    <script>
+        function load(){
+            setInterval(function(e){
+                history.back(1)
+                clearInterval(e)
+            },3000)
+        }
+        load();
+    </script>
+</head>
+<body>
+    <p>Loading ...</p>
+</body>
+</html>

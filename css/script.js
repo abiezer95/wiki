@@ -47,8 +47,8 @@ function edit(){
 		$(".edit").html("Mostrar Edit |"),
 		$(".login").hide("fast"),
 		$(".registrar").hide("fast");
-		$("textarea").css("display", "none");	
+		$("textarea").css("display", "none");
 i=0;
-	}	
+	}
 }
 

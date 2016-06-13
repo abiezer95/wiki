@@ -11,6 +11,13 @@ body{background:#f2f2f2}
 #logo div b{position: relative;margin-right:5px;top:15px;font-size:18px;font-weight: lighter;color:#fff;opacity: 0.9;cursor: pointer;}
 #logo div b:hover{text-decoration:underline;}
 
+#logo2{position:fixed;top:0;background:#000000;width:99.9%;height:50px;}
+#logo2 h1{position: absolute;left:5%;top:10px;font-size:25px;color:#fff;cursor:pointer;}
+#logo2 h1 img{width:20px;}
+#logo2 div{position: absolute;right:5%;}
+#logo2 div b{position: relative;margin-right:5px;top:15px;font-size:18px;font-weight: lighter;color:#fff;opacity: 0.9;cursor: pointer;}
+#logo2 div b:hover{text-decoration:underline;}
+
 .login{position:absolute;top:50px;right:0px;width:300px;height:180px;background:#fff;box-shadow: 0px 0px 20px rgba(0,0,0,0.5);border-radius:10px}
 .login input{position: relative;top:20px;left:10px;width:250px;height:30px;font-size:16px}
 
