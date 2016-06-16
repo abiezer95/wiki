@@ -24,21 +24,20 @@ class Handler(webapp2.RequestHandler):
     self.write(self.render_str(template, **kw))
 
 #clase database
-class Db1(db.Model):
+class Post(db.Model):
   fecha=db.DateTimeProperty(auto_now_add = True)
   text=db.TextProperty(required=True)
   user2=db.StringProperty(required = False)
   urll=db.StringProperty(required = False)
-  pub2=db.StringProperty(required = False)
+  num=db.StringProperty(required = False)
 
 class Comment(db.Model):
   fecha=db.DateTimeProperty(auto_now_add = True)
   text=db.TextProperty(required = True)
   user=db.TextProperty(required = False)
-  n=db.TextProperty(required = True)
+  num=db.TextProperty(required = False)
 
-class Db2(db.Model):
-      #texto=db.StringProperty(required = True)
+class Logins(db.Model):
       fecha=db.DateTimeProperty(auto_now_add = True)
       name=db.StringProperty(required = False)
       user=db.StringProperty(required = True)
@@ -46,34 +45,34 @@ class Db2(db.Model):
 
 class MainHandler(Handler):
   #body de html
-    def datos(self):
-      return db.GqlQuery("SELECT * FROM Db2 "
+    def logindb(self):
+      return db.GqlQuery("SELECT * FROM Logins "
                           "ORDER BY fecha DESC")
-    def datos2(self):
-      return db.GqlQuery("SELECT * FROM Db1 "
+    def postdb(self):
+      return db.GqlQuery("SELECT * FROM Post "
                           "ORDER BY fecha DESC")
-    def datos3(self):
+    def commentdb(self):
       return db.GqlQuery("SELECT * FROM Comment "
                           "ORDER BY fecha DESC")
     def get(self):
-        data2=self.datos2()
-        data3=self.datos3()
+        data2=self.postdb()
+        data3=self.commentdb()
         user=self.validar()
         self.render("content.html", data=data2, comment=data3, user=user)
-        #db.delete(Db1.all(keys_only=True))
+        #db.delete(Post.all(keys_only=True))
 
     def validar(self):
       a=self.get_cookies("user_id")
       if a:
         a=self.check_secure_val(a)
-        for d in self.datos():
+        for d in self.logindb():
           s=str(d.key().id())
           if s==a:
             return d.user.title()
             break
 
     def reg(self, pword, name, user):
-        validar=Db2.all().filter('user = ', user).get()
+        validar=Logins.all().filter("user = ", user).get()
         if validar:
           self.render("error2.html")
         else:
@@ -82,7 +81,7 @@ class MainHandler(Handler):
 
     def log(self, user, pword):
       ps=self.start_secret(pword)
-      f=Db2.all().filter('user = ', user).get()
+      f=Logins.all().filter('user = ', user).get()
       if f:
         p=str(f.pword)
         if ps==p:
@@ -122,31 +121,31 @@ class MainHandler(Handler):
       pword=self.getP("passreg")
       name=self.getP("nombre")
       pub=self.getP("text")
-      c=self.getP("comentar")
+      num=self.getP("comentar")
       if user and pword and name:
         self.reg(pword, name, user)
       elif pub:
         self.postt(pub)
-      elif c:
-        self.commentar(c)
+      elif num:
+        self.commentar(num)
       else:
         user=self.getP("user")
         pword=self.getP("pass")
         self.log(user, pword)
 
-    def commentar(self, c):
-      n=self.getP("id")
+    def commentar(self, text):
+      num=self.getP("id")
       user=self.validar()
-      r=Comment(text=c, n=n, user=user)
+      r=Comment(text=text, num=num, user=user)
       r.put()
       self.redirect("pub")
 
 
-    def postt(self, pub):
+    def postt(self, text):
       user=self.request.get("user")
       #self.write(pub)
       salt=self.salts()
-      r=Db1(text = pub, user2=user, urll="/000", pub2=salt)
+      r=Post(text = text, user2=user, urll="/000", num=salt)
       r.put()
       self.redirect("pub")
 
@@ -158,7 +157,7 @@ class MainHandler(Handler):
 class Session(MainHandler):
   def create_session(self, pword, name, user):
       pword=self.start_secret(pword)
-      a=Db2(name = name, user = user, pword = pword)
+      a=Logins(name = name, user = user, pword = pword)
       a.put()
       pword=str(a.key().id())
       return pword
@@ -185,34 +184,35 @@ class Pub(Handler):
 
 class Url(MainHandler):
  def get(self, url):
-    val=Db1.all().filter("urll = ", url).get()
+    val=Post.all().filter("urll = ", url).get()
     if val:
-      data2=self.datos2()
+      data=self.postdb()
       user=self.validar()
-      self.render("url.html", data=data2, user=user, url=url)
+      self.render("url.html", data=data, user=user, url=url)
     else:
-      data2=self.datos2()
+      data=self.postdb()
       user=self.validar()
-      self.render("url.html", data=data2, user=user, url=url)
+      self.render("url.html", data=data, user=user, url=url)
 
  def post(self, url):
   a=self.getP("text")
   user=self.getP("user")
-  d=Db1(text=a, user2=user, urll=url)
+  d=Post(text=a, user2=user, urll=url)
   d.put()
   self.render("loading2.html")
 
 class Json(MainHandler):
   def get(self):
-    data3=self.datos3()
-    data2=self.datos2()
+    post=self.postdb()
+    comment=self.commentdb()
     a={}
-    for d in data2:
-      for d2 in data3:
-        a[d.pub2]=" "
-        if d.pub2==d2.n:
-          a[d.pub2]=d2.text
-      self.write(str(a))
+    for p in post:
+      a[p.num]=[]
+      for c in comment:
+        if p.num == c.num:
+          a[p.num].append(c.text+" ,"+c.user)
+          
+    self.write(str(a))
 
 url = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
 #esto me lee la url y permite los caracteres qe le mande
