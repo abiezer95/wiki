@@ -3,7 +3,15 @@
 <div id="content2">
 	<center class="content">
 	{% if user!=None %}
-		<h2>Haz un post</h2><form method="post"><textarea placeholder="Escribe tu articulo aqui" name="text" id="limpiar" required></textarea><input type="hidden" name="user" value={{user}}><br><br><button>Postear</button></form><br><button  onclick='$("#limpiar").val("");$("#limpiar").focus();'>Limpiar todo</button>
+		<h2>Haz un post</h2><form method="post">
+		<textarea placeholder="Escribe tu articulo aqui" name="text" id="limpiar" required></textarea><br><br>
+		<label>Categoria: </label><select name="select">
+			<option value="musica">Musica</option>
+			<option value="familia">Familia</option>
+			<option value="amor">Amor</option>
+			<option value="Ocio" selected>Ocio</option>
+		</select>
+		<input type="hidden" name="user" value={{user}}><br><br><button>Postear</button></form><br><button  onclick='$("#limpiar").val("");$("#limpiar").focus();'>Limpiar todo</button>
 	{% else %}
 		<h2>No puedes publicar</h2>
 		<p>inicia sesion para hacerlo</p>
@@ -11,13 +19,27 @@
 	</center>
 
 <center id="feed">
-<b style="opacity:0.8;font-size:25px;font-weight:lighter;">Publicaciones</b>
+<a style="opacity:0.8;font-size:25px;font-weight:lighter;">Publicaciones</a>
 <hr>
 {% for texto in data %}
-	<b onclick="var p='{{texto.text}}';var id='{{texto.num}}';var user='{{texto.user2}}';pub(p, user, id);">{{texto.fecha}} - {{texto.user2}} - {{texto.urll}}</b>
-	<hr>
-
+	<b onclick="var p='{{texto.text}}';var id='{{texto.num}}';var user='{{texto.user2}}';post(p, user, id);" class="{{texto.num}}">{{texto.fecha}} - {{texto.user2}} - {{texto.urll}}<hr></b>
+	
 {% endfor %}
+<div class="graphic">
+	<center>
+		<button>Grafico de barra</button>
+		<input type="hidden" value="">
+	</center>
+
+	<div class="graficos">
+	</div>
+	<ul>
+		<li>Music</li>
+		<li>Familia</li>
+		<li>Amor</li>
+		<li>ocio</li>
+	</ul>
+</div>
 </center>
 	<div class="login">
 <form method="post">
@@ -27,10 +49,12 @@
 
 </form><button onclick="cerrar()">Cancelar</button>
 	</div>
-
-
 	<div class="registrar">
 <form method="post">
+
+<select name=""> 
+	<option value=""></option>
+</select>
 	<input type="text" name="userreg" placeholder="Username" required><br><br>
 	<input type="password" name="passreg" placeholder="••••••••" required><br><br>
 	<input type="text" name="nombre" placeholder="Nombre completo" required>
@@ -65,14 +89,8 @@
 		<textarea name="comentar" placeholder="Comentar ..."></textarea>
 		<input type="hidden" class="id" name="id">
 		<button>Comentar</button>
-		<hr class="hr">
-		<center>
-			{% for c in comment %}
-			<section>
-				{{c.text}}<br><tt> - Publicado por {{c.user}} -</tt><hr>
-			</section>
-			{% endfor %}
-		</center>
 	</form>
+	<hr class="hr">
+<center></center>
 </div>
 {% endblock %}

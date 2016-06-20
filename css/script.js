@@ -1,25 +1,55 @@
 $(document).ready(function(){
-	$(".login").css("display", "none"),
-	$(".registrar").css("display", "none");
-	$("#content").css("display", "none");
-	$(".load").css("display", "none");
-	$(".comment").css("display", "none");
-	$.ajax({
-		data: "http://localhost:8080/content/.json",
-		type: "POST",
-		datatype: "Json"
-
-	})
+	elementosocultos();
+	graphic();
 });
+function eliminar(){
+	var id=$(".id").val();
+	var url="/eliminar/deletepost?post="+id+"";
+	$.post(url, function(e){
+		var inter=setInterval(function(){
+				$("."+id+"").css("display","none");
+				//$("#feed").html(e)
+			clearInterval(inter);
+		},2000);
 
-function pub(p, user, id){
+	}).done(function() {
+    alert( "Tu publicacion se Elimino correctamente" );
+  	})
+  	.fail(function() {
+    	alert( "Error al eliminar la publicacion" );
+ 	 })
+$("#content2").css({"-webkit-filter": "blur(0px)", "filter": "blur(0px)"}),
+$(".load").css("display", "none");
+$("#content").css("display", "none");
+$("."+id+"").css({"background":"#FF0040", "color":"#fff"})
+}
+function graphic(){
+	valores=$(".graphic center input").val()
+	valores=valores.split(",");
+var i=0, e=20;
+var color=["#2EFE2E", "#FE9A2E", "#FFFF00", "#0080FF"]
+for(valor in valores){
+	if(valores[i]==""){
+		var val=valores[i];
+		val=1;
+	}else{
+		var val=valores[i];
+	}
+	var valor=val/3;
+$(".graphic .graficos").append("<section class='a"+i+"'>"+valores[i]+"</section>");
+$(".graficos .a"+i+"").css({"background": ""+color[i]+"", "left": ""+e+"px", "height": ""+valor+"%"})
+i=i+1;
+e=e+110/2;
+}
+}
+function post(p, user, id){
 	$("#content2").css({"-webkit-filter": "blur(3px)", "filter": "blur(3px)"}),
 	$("#content").css("display", "block"),
 	$(".load").css({"display": "block", "width": "400px", "height": "50px","left": "35%"}),
-	$(".load").html("<center><img src='/images/loading.gif' width='50'></center>");
-	$(".id").val("")
-p=p.replace("\n", "")
-var pub="<br><center><h3>Publicacion hecha por "+user+"</h3><hr><br><b>"+p+"</b><br><button onclick='cerrar()'>Cerrar</button><br><br><button onclick='comment()'>Comentarios</button></center>";
+	$(".load").html("<center><img src='/images/loading.gif' width='50'></center>"),
+	$(".id").val("");
+posts=p.replace("\n", "");
+var pub="<br><center><h3>Publicacion hecha por "+user+"</h3><hr><br><b>"+posts+"</b><br><button onclick='cerrar()'>Cerrar</button><br><br><button onclick='comment()'>Comentarios</button><button onclick='eliminar()'>Eliminar Post</button></center>";
 var inter=setInterval(function(){
 		$(".load").css({"width": "500px", "height": "400px", "left": "30%"}),
 		$(".load").html(pub);
@@ -27,9 +57,31 @@ var inter=setInterval(function(){
 		clearInterval(inter);
 	},2000);
 }
+
+function deletecomment(id, fecha){
+	var url="/eliminar/deletecomment?id="+id+"&fecha="+fecha+"";
+	$.post(url, function(e){
+		$(".comment center").html(e)
+	});
+}
+
 function comment(){
 	$(".load").css("display", "none");
-	$(".comment").css({"top": "-500px", "left": "35%", "display": "block"})
+	$(".comment").css({"top": "-500px", "left": "35%", "display": "block"});
+	$(".comment center").html("")
+$.getJSON('/content/.json', function (data) {
+   var id=$(".id").val()
+   var i=0;
+for(d in data){
+	if(id==d){
+		for(n in data[d]){
+			comments=data[d][n].split("*/");
+			$(".comment center").append("<section value='  '>"+comments[0]+"<br><tt> - Publicado por a - "+comments[1]+" - <tt onclick='var id=\""+comments[2]+"+\";var fecha=\""+comments[3]+"\";deletecomment(id, fecha)' style='cursor:pointer;text-decoration:underline'>click aqui para eliminar </tt></tt><hr></section>");
+			i=i+1;
+		}
+	}  
+}
+  })
 	var inter=setInterval(function(){
 		$(".comment").css({"width": "400px", "height": "500px", "top": "55px", "-webkit-transition": "top 0.3s"}),
 		clearInterval(inter);
@@ -70,3 +122,10 @@ i=0;
 	}
 }
 
+var elementosocultos=function(){
+	$(".login").css("display", "none"),
+	$(".registrar").css("display", "none");
+	$("#content").css("display", "none");
+	$(".load").css("display", "none");
+	$(".comment").css("display", "none");
+}

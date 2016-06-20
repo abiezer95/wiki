@@ -30,6 +30,7 @@ class Post(db.Model):
   user2=db.StringProperty(required = False)
   urll=db.StringProperty(required = False)
   num=db.StringProperty(required = False)
+  categoria=db.IntegerProperty(int)
 
 class Comment(db.Model):
   fecha=db.DateTimeProperty(auto_now_add = True)
@@ -58,7 +59,7 @@ class MainHandler(Handler):
         data2=self.postdb()
         data3=self.commentdb()
         user=self.validar()
-        self.render("content.html", data=data2, comment=data3, user=user)
+        self.render("content.html", data=data2, comment=data3, user=user, f=0)
         #db.delete(Post.all(keys_only=True))
 
     def validar(self):
@@ -80,14 +81,16 @@ class MainHandler(Handler):
           self.redirect("/token=reg?username="+user+"&name="+name+"&n=1")
 
     def log(self, user, pword):
-      ps=self.start_secret(pword)
-      f=Logins.all().filter('user = ', user).get()
-      if f:
-        p=str(f.pword)
-        if ps==p:
-          p=self.make_secure_val(str(f.key().id()))
+      pword=self.start_secret(pword)
+      login=Logins.all().filter('user = ', user).get()
+      if login:
+        p=str(login.pword)
+        if pword==p:
+          p=self.make_secure_val(str(login.key().id()))
           self.add_cookies("user_id", p)
           self.redirect("/")
+        else:
+          self.render("error.html")
       else:
         self.render("error.html")
 
@@ -140,12 +143,14 @@ class MainHandler(Handler):
       r.put()
       self.redirect("pub")
 
+    #def count(self, n):
+     # num=Post.all().filter("")
 
     def postt(self, text):
-      user=self.request.get("user")
-      #self.write(pub)
+      user=self.getP("user")
+      tag=1
       salt=self.salts()
-      r=Post(text = text, user2=user, urll="/000", num=salt)
+      r=Post(text = text, user2=user, urll="/000", num=salt, categoria=tag)
       r.put()
       self.redirect("pub")
 
@@ -201,20 +206,35 @@ class Url(MainHandler):
   d.put()
   self.render("loading2.html")
 
+url = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
+
 class Json(MainHandler):
   def get(self):
     post=self.postdb()
     comment=self.commentdb()
-    a={}
+    json={}
     for p in post:
-      a[p.num]=[]
+      json[p.num]=[]
       for c in comment:
         if p.num == c.num:
-          a[p.num].append(c.text+" ,"+c.user)
-          
-    self.write(str(a))
+          json[""+p.num+""].append(""+c.text+""+"*/"+""+c.user+""+"*/"+""+c.num+""+"*/"+""+str(c.fecha))
+    json=str(json).replace("u'", '"').replace("'", '"');
+    self.write(json)
 
-url = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
+class Deletepost(MainHandler):
+  def post(self):
+    post=self.getP("post")
+    comentarios=self.commentdb()
+    for c in comentarios:
+      if post==c.num:
+        db.delete(c)    
+    db.delete(Post.all().filter("num = ", post).get())
+
+class Deletecomment(MainHandler):
+  def post(self):
+    key=self.getP("id")
+    fecha=self.getP("fecha")
+    self.write(fecha)
 #esto me lee la url y permite los caracteres qe le mande
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
@@ -222,6 +242,8 @@ app = webapp2.WSGIApplication([
     ('/token=login', Login),
     ('/logout', Logout),
     ('/pub', Pub),
-    (url, Url),
-    ("/content/.json", Json)
+    ("/content/.json", Json),
+    ("/eliminar/deletepost", Deletepost),
+    ("/eliminar/deletecomment", Deletecomment),
+    (url, Url)
 ], debug=True)
