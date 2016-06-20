@@ -173,15 +173,13 @@ class Posteados(MainHandler):
     dic={}
     for post in postdb:
       dic[post.num]=[]
-      if private:
-        for p in private:
-          if p:
-            dic[post.num].append("1")
-          else:
-            dic[post.num].append("0")
-      else:
-        dic[post.num].append("0")
-    self.write(str(dic))
+      for p in private:
+        if post.num==p.keysid:
+           dic[post.num].append("1,"+post.user2)
+        else:
+          dic[post.num].append("0")
+    dic[post.num].append("0"+","+post.user2)
+    self.write(str(dic).replace("u'", '"').replace("'", '"'))
 
 
 class Session(MainHandler):

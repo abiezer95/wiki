@@ -3,10 +3,16 @@
 
 <script>
 $(document).ready(function(){
-	$.post("", function(){
-
+	$.getJSON("/posteados/post", function(e){
+		for(val in e){
+			valores=String(e[val]).split(",")
+		if(valores[0]==0 || valores[0]==null){
+			$("#"+val+"").html('<img src="/images/show.png" title="click para ocultar Publicación" onclick="var user=\''+valores[1]+'\';var id=\''+val+'\';privatepost(user, id)">')
+		}else{
+			$("#"+val+"").html('<img src="/images/hide.png" title="click para ocultar Publicación" onclick="var user=\''+valores[1]+'\';var id=\''+val+'\';publicpost(user, id)">')
+		}
+		}
 	})
-	$("#")
 });
 </script>
 
