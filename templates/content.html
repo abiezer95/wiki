@@ -22,11 +22,12 @@
 <a style="opacity:0.8;font-size:25px;font-weight:lighter;">Publicaciones</a>
 <hr>
 {% for texto in data %}
-	<b onclick="var p='{{texto.text}}';var id='{{texto.num}}';var user='{{texto.user2}}';post(p, user, id);" class="{{texto.num}}">{{texto.fecha}} - {{texto.user2}} - {{texto.urll}}<hr></b>
-	
+<div class="private"></div>
+	<b onclick="var p='{{texto.text}}';var id='{{texto.num}}';var user='{{texto.user2}}';post(p, user, id);" class="{{texto.num}}">{{texto.fecha}} - {{texto.user2}} - {{texto.urll}} <hr></b>
 {% endfor %}
 <div class="graphic">
 	<center>
+		<button onclick="bestcomment()">posts más comentados</button>
 		<button>Grafico de barra</button>
 		<input type="hidden" value="">
 	</center>
@@ -51,10 +52,6 @@
 	</div>
 	<div class="registrar">
 <form method="post">
-
-<select name=""> 
-	<option value=""></option>
-</select>
 	<input type="text" name="userreg" placeholder="Username" required><br><br>
 	<input type="password" name="passreg" placeholder="••••••••" required><br><br>
 	<input type="text" name="nombre" placeholder="Nombre completo" required>
@@ -93,4 +90,6 @@
 	<hr class="hr">
 <center></center>
 </div>
+
+<div class="bestcomment"></div>
 {% endblock %}

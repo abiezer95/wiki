@@ -44,6 +44,10 @@ class Logins(db.Model):
       user=db.StringProperty(required = True)
       pword=db.StringProperty(required = True)
 
+class Privatepost(db.Model):
+  user=db.StringProperty(required = False)
+  keysid=db.StringProperty(required = False)
+
 class MainHandler(Handler):
   #body de html
     def logindb(self):
@@ -56,11 +60,14 @@ class MainHandler(Handler):
       return db.GqlQuery("SELECT * FROM Comment "
                           "ORDER BY fecha DESC")
     def get(self):
-        data2=self.postdb()
-        data3=self.commentdb()
+        postdb=db.GqlQuery("SELECT * FROM Post "
+                          "ORDER BY fecha DESC LIMIT 7")
+        private=db.GqlQuery("SELECT * FROM Post "
+                          "ORDER BY fecha DESC")
+        commentdb=self.commentdb()
         user=self.validar()
-        self.render("content.html", data=data2, comment=data3, user=user, f=0)
-        #db.delete(Post.all(keys_only=True))
+        self.render("content.html", data=postdb, comment=commentdb, user=user, f=0, private=private)
+        #db.delete(Comment.all(keys_only=True))
 
     def validar(self):
       a=self.get_cookies("user_id")
@@ -218,8 +225,16 @@ class Json(MainHandler):
       for c in comment:
         if p.num == c.num:
           json[""+p.num+""].append(""+c.text+""+"*/"+""+c.user+""+"*/"+""+c.num+""+"*/"+""+str(c.fecha))
-    json=str(json).replace("u'", '"').replace("'", '"');
+    json=str(json).replace("u'", '"').replace("'", '"')
     self.write(json)
+
+
+class Privatespost(MainHandler):
+  def post(self):
+    keysid=self.getP("id")
+    user=self.getP("user")
+    r=Privatepost(user=user, keysid=keysid)
+    r.put()
 
 class Deletepost(MainHandler):
   def post(self):
@@ -227,14 +242,36 @@ class Deletepost(MainHandler):
     comentarios=self.commentdb()
     for c in comentarios:
       if post==c.num:
-        db.delete(c)    
+        db.delete(c)
     db.delete(Post.all().filter("num = ", post).get())
 
 class Deletecomment(MainHandler):
   def post(self):
-    key=self.getP("id")
-    fecha=self.getP("fecha")
-    self.write(fecha)
+    texto=str(self.getP("texto"))
+    fecha=str(self.getP("fecha"))
+    comentarios=self.commentdb()
+    for c in comentarios:
+      if fecha==str(c.fecha) and texto==str(c.text):
+        db.delete(c)
+
+class Bestcomment(MainHandler):
+  def get(self):
+    dic=self.count()
+    self.render("bestcomment.php", dic=dic)
+
+  def count(self):
+    comentarios=self.commentdb()
+    post=self.postdb()
+    dic={}
+    for p in post:
+      i=0
+      dic[p.num]=[]
+      for c in comentarios:
+         if p.num==c.num:
+          i=i+1
+      dic[p.num].append(i)
+    return str(dic).replace("u'", '"').replace("'", '"')
+
 #esto me lee la url y permite los caracteres qe le mande
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
@@ -245,5 +282,7 @@ app = webapp2.WSGIApplication([
     ("/content/.json", Json),
     ("/eliminar/deletepost", Deletepost),
     ("/eliminar/deletecomment", Deletecomment),
+    ("/private/post", Privatespost),
+    ("/best/comments", Bestcomment),
     (url, Url)
 ], debug=True)

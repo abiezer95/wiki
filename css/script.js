@@ -42,6 +42,17 @@ i=i+1;
 e=e+110/2;
 }
 }
+
+function privatepost(user, id){
+	var url="/private/post?id="+id+"&user="+user+"";
+	$("#feed img").attr("src","/images/hide.png");
+	$.post(url, function(e){
+		location.href="pub";
+	}).fail(function(){
+		alert("no se ha podido ocultar la publicacion")
+	})
+}
+
 function post(p, user, id){
 	$("#content2").css({"-webkit-filter": "blur(3px)", "filter": "blur(3px)"}),
 	$("#content").css("display", "block"),
@@ -58,11 +69,26 @@ var inter=setInterval(function(){
 	},2000);
 }
 
-function deletecomment(id, fecha){
-	var url="/eliminar/deletecomment?id="+id+"&fecha="+fecha+"";
+function bestcomment(){
+	$("#content2").css({"-webkit-filter": "blur(3px)", "filter": "blur(3px)"}),
+	$(".bestcomment").load("/best/comments"),
+	$(".bestcomment").css("display","block")
+}
+
+function deletecomment(fecha,texto, id){
+	var url="/eliminar/deletecomment?fecha="+fecha+"&texto="+texto+"";
 	$.post(url, function(e){
-		$(".comment center").html(e)
-	});
+		var inter = setInterval(function(){
+			$("#"+id+"").css("display", "none");
+			clearInterval(inter);
+	},1000)
+		//$(".comment center").html(e)
+	}).done(function(e) {
+    alert("eliminado con exito");
+  	})
+  	.fail(function() {
+    	alert( "Error al eliminar el comentario" );
+ 	 })
 }
 
 function comment(){
@@ -76,10 +102,10 @@ for(d in data){
 	if(id==d){
 		for(n in data[d]){
 			comments=data[d][n].split("*/");
-			$(".comment center").append("<section value='  '>"+comments[0]+"<br><tt> - Publicado por a - "+comments[1]+" - <tt onclick='var id=\""+comments[2]+"+\";var fecha=\""+comments[3]+"\";deletecomment(id, fecha)' style='cursor:pointer;text-decoration:underline'>click aqui para eliminar </tt></tt><hr></section>");
+			$(".comment center").append("<section id='"+comments[2]+"'>"+comments[0]+"<br><tt> - Publicado por a - "+comments[1]+" - <tt onclick='var id=\""+comments[2]+"\";var fecha=\""+comments[3]+"\";var texto=\""+comments[0]+"\";deletecomment(fecha, texto, id)' style='cursor:pointer;text-decoration:underline'>click aqui para eliminar <input type='hidden' value='"+comments[2]+"'></tt></tt><hr></section>");
 			i=i+1;
 		}
-	}  
+	}
 }
   })
 	var inter=setInterval(function(){
@@ -103,6 +129,7 @@ function cerrar(){
 	$("#content").css("display", "none");
 	$(".load").css("display", "none");
 	$(".comment").css("display", "none");
+	$(".bestcomment").css("display", "none");
 }
 var i=0;
 function edit(){
