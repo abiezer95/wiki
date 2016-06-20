@@ -1,5 +1,15 @@
 {% extends "proyecto.html" %}
 {% block content %}
+
+<script>
+$(document).ready(function(){
+	$.post("", function(){
+
+	})
+	$("#")
+});
+</script>
+
 <div id="content2">
 	<center class="content">
 	{% if user!=None %}
@@ -22,7 +32,7 @@
 <a style="opacity:0.8;font-size:25px;font-weight:lighter;">Publicaciones</a>
 <hr>
 {% for texto in data %}
-<div class="private"></div>
+<div id="{{texto.num}}"></div>
 	<b onclick="var p='{{texto.text}}';var id='{{texto.num}}';var user='{{texto.user2}}';post(p, user, id);" class="{{texto.num}}">{{texto.fecha}} - {{texto.user2}} - {{texto.urll}} <hr></b>
 {% endfor %}
 <div class="graphic">

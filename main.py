@@ -62,11 +62,9 @@ class MainHandler(Handler):
     def get(self):
         postdb=db.GqlQuery("SELECT * FROM Post "
                           "ORDER BY fecha DESC LIMIT 7")
-        private=db.GqlQuery("SELECT * FROM Post "
-                          "ORDER BY fecha DESC")
         commentdb=self.commentdb()
         user=self.validar()
-        self.render("content.html", data=postdb, comment=commentdb, user=user, f=0, private=private)
+        self.render("content.html", data=postdb, comment=commentdb, user=user, f=0)
         #db.delete(Comment.all(keys_only=True))
 
     def validar(self):
@@ -165,6 +163,26 @@ class MainHandler(Handler):
       pword=self.hash_keys(pword)
       pword=self.secret(pword)
       return pword
+
+class Posteados(MainHandler):
+  def get(self):
+    postdb=db.GqlQuery("SELECT * FROM Post "
+                          "ORDER BY fecha DESC")
+    private=db.GqlQuery("SELECT * FROM Privatepost "
+                          "ORDER BY user DESC")
+    dic={}
+    for post in postdb:
+      dic[post.num]=[]
+      if private:
+        for p in private:
+          if p:
+            dic[post.num].append("1")
+          else:
+            dic[post.num].append("0")
+      else:
+        dic[post.num].append("0")
+    self.write(str(dic))
+
 
 class Session(MainHandler):
   def create_session(self, pword, name, user):
@@ -280,6 +298,7 @@ app = webapp2.WSGIApplication([
     ('/logout', Logout),
     ('/pub', Pub),
     ("/content/.json", Json),
+    ("/posteados/post", Posteados),
     ("/eliminar/deletepost", Deletepost),
     ("/eliminar/deletecomment", Deletecomment),
     ("/private/post", Privatespost),
