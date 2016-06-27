@@ -58,21 +58,22 @@ function graphic() {
 
 function privatepost(user, id) {
     var url = "/private/post?id=" + id + "&user=" + user + "";
-    $("#feed img").attr("src", "/images/hide.png");
+    var replace='var user="'+user+'";var id="'+id+'";publicpost(user, id)'
+    $("#"+id+"").attr({"src": "/images/hide.png", "onclick": replace});
     $.post(url, function(e) {
-        location.href = "pub";
+        //location.href = "pub";
+        console.log("se ha ocultado con exito")
     }).fail(function() {
         alert("no se ha podido ocultar la publicacion")
     })
 }
-
 function publicpost(user, id) {
-    var url = "/private/post?id=" + id + "&user=" + user + "";
-    $("#feed img").attr("src", "/images/hide.png");
+    var url = "/public/post?id="+id+"";
+    $("#"+id+"").attr("src", "/images/show.png");
     $.post(url, function(e) {
-        location.href = "pub";
+        //location.href = "pub"; 
     }).fail(function() {
-        alert("no se ha podido ocultar la publicacion")
+        alert("no se ha podido hacer publica la publicacion")
     })
 }
 

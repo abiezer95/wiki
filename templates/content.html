@@ -3,15 +3,9 @@
 
 <script>
 $(document).ready(function(){
-	$.getJSON("/posteados/post", function(e){
-		for(val in e){
-			valores=String(e[val]).split(",")
-		if(valores[0]==0 || valores[0]==null){
-			$("#"+val+"").html('<img src="/images/show.png" title="click para ocultar Publicación" onclick="var user=\''+valores[1]+'\';var id=\''+val+'\';privatepost(user, id)">')
-		}else{
-			$("#"+val+"").html('<img src="/images/hide.png" title="click para ocultar Publicación" onclick="var user=\''+valores[1]+'\';var id=\''+val+'\';publicpost(user, id)">')
-		}
-		}
+	var url="/posteos?user={{user}}"
+	$.post(url, function(e){
+		$("#feed").prepend(e)
 	})
 });
 </script>
@@ -35,12 +29,8 @@ $(document).ready(function(){
 	</center>
 
 <center id="feed">
-<a style="opacity:0.8;font-size:25px;font-weight:lighter;">Publicaciones</a>
-<hr>
-{% for texto in data %}
-<div id="{{texto.num}}"></div>
-	<b onclick="var p='{{texto.text}}';var id='{{texto.num}}';var user='{{texto.user2}}';post(p, user, id);" class="{{texto.num}}">{{texto.fecha}} - {{texto.user2}} - {{texto.urll}} <hr></b>
-{% endfor %}
+
+<button style='position:relative;top:10px;border:0;background:#FF0040;color:#fff;font-size:16px;border-radius:5px'>Ver todo</button>
 <div class="graphic">
 	<center>
 		<button onclick="bestcomment()">posts más comentados</button>

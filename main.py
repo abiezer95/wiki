@@ -61,11 +61,12 @@ class MainHandler(Handler):
                           "ORDER BY fecha DESC")
     def get(self):
         postdb=db.GqlQuery("SELECT * FROM Post "
-                          "ORDER BY fecha DESC LIMIT 7")
+                          "ORDER BY fecha DESC LIMIT 4")
         commentdb=self.commentdb()
         user=self.validar()
         self.render("content.html", data=postdb, comment=commentdb, user=user, f=0)
-        #db.delete(Comment.all(keys_only=True))
+        #db.delete(Post.all(keys_only=True))
+        #db.delete(Privatepost.all(keys_only=True))
 
     def validar(self):
       a=self.get_cookies("user_id")
@@ -171,16 +172,51 @@ class Posteados(MainHandler):
     private=db.GqlQuery("SELECT * FROM Privatepost "
                           "ORDER BY user DESC")
     dic={}
+    i=0
     for post in postdb:
       dic[post.num]=[]
       for p in private:
+        i=1
         if post.num==p.keysid:
            dic[post.num].append("1,"+post.user2)
-        else:
-          dic[post.num].append("0")
-    dic[post.num].append("0"+","+post.user2)
+      if i==0:
+        dic[post.num].append("0,"+post.user2)
+    
     self.write(str(dic).replace("u'", '"').replace("'", '"'))
 
+class Posteos(MainHandler):
+  def post(self):
+    postdb=db.GqlQuery("SELECT * FROM Post "
+                          "ORDER BY fecha DESC LIMIT 4")
+    private=db.GqlQuery("SELECT * FROM Privatepost "
+                          "ORDER BY user DESC")
+    user=self.getP("user")
+      
+    for post in postdb: 
+      i=0
+      for p in private:
+        if p.keysid==post.num and post.user2==user:
+          i=1
+          image="/images/hide.png"
+          function="publicpost(user, id)"
+          self.render("post.php", user=post.user2, keysid=post.num, text=post.text, fecha=str(post.fecha), url=post.urll, image=image, function=function)
+        elif p.keysid==post.num and post.user2!=user:
+          i=3
+        elif p.keysid!=post.num and post.user2!=user:  
+          i=2
+          
+
+      if i==0:
+        image="/images/show.png"
+        function="privatepost(user, id)"
+        self.render("post.php", user=post.user2, keysid=post.num, text=post.text, fecha=str(post.fecha), url=post.urll, image=image, function=function)
+      if i==2:
+        image="/images/public.png"
+        function=""
+        self.render("post.php", user=post.user2, keysid=post.num, text=post.text, fecha=str(post.fecha), url=post.urll, image=image, function=function)
+
+      
+      
 
 class Session(MainHandler):
   def create_session(self, pword, name, user):
@@ -252,6 +288,13 @@ class Privatespost(MainHandler):
     r=Privatepost(user=user, keysid=keysid)
     r.put()
 
+class Publicpost(MainHandler):
+  def post(self):
+    keysid=self.getP("id")
+    filtrar=Privatepost.all().filter("keysid = ", keysid)
+    db.delete(filtrar)
+    
+
 class Deletepost(MainHandler):
   def post(self):
     post=self.getP("post")
@@ -297,9 +340,11 @@ app = webapp2.WSGIApplication([
     ('/pub', Pub),
     ("/content/.json", Json),
     ("/posteados/post", Posteados),
+    ("/posteos", Posteos),
     ("/eliminar/deletepost", Deletepost),
     ("/eliminar/deletecomment", Deletecomment),
     ("/private/post", Privatespost),
+    ("/public/post", Publicpost),
     ("/best/comments", Bestcomment),
     (url, Url)
 ], debug=True)

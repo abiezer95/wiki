@@ -1,0 +1,1 @@
+<div><img src='{{image}}' onclick='var user="+post.user2+";var id="{{keysid}}";{{function}}' id="{{keysid}}"></div><b onclick='var p="{{text}}";var id="+post.num+";var user="{{user}}";post(p, user, id);' class="+post.num+">{{fecha}} - {{user}} - {{url}}<hr></b>
