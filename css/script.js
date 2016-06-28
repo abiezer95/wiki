@@ -3,6 +3,19 @@ $(document).ready(function() {
     graphic();
 });
 
+function postall(user){
+    var url="/posteos2?user="+user+""
+    $("#content2").css({
+            "-webkit-filter": "blur(3px)",
+            "filter": "blur(3px)"
+        }),
+        $("#content").css("display", "block"),
+        $(".bestcomment").css("display", "block")
+    $.post(url, function(e){
+        $(".bestcomment").html("<center style='cursor:pointer'>"+e+"</center>")
+    })
+}
+
 function eliminar() {
     var id = $(".id").val();
     var url = "/eliminar/deletepost?post=" + id + "";
@@ -90,6 +103,7 @@ function post(p, user, id) {
             "left": "35%"
         }),
         $(".load").html("<center><img src='/images/loading.gif' width='50'></center>"),
+        $(".bestcomment").css("display", "none"),
         $(".id").val("");
     posts = p.replace("\n", "");
     var pub = "<br><center><h3>Publicacion hecha por " + user + "</h3><hr><br><b>" + posts + "</b><br><button onclick='cerrar()'>Cerrar</button><br><br><button onclick='comment()'>Comentarios</button><button onclick='eliminar()'>Eliminar Post</button></center>";
@@ -209,4 +223,5 @@ var elementosocultos = function() {
     $("#content").css("display", "none");
     $(".load").css("display", "none");
     $(".comment").css("display", "none");
+    $(".bestcomment").css("display", "none");
 }

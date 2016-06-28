@@ -166,6 +166,7 @@ class MainHandler(Handler):
       return pword
 
 class Posteados(MainHandler):
+  #sacando informacion de privacidad en posts
   def get(self):
     postdb=db.GqlQuery("SELECT * FROM Post "
                           "ORDER BY fecha DESC")
@@ -185,38 +186,61 @@ class Posteados(MainHandler):
     self.write(str(dic).replace("u'", '"').replace("'", '"'))
 
 class Posteos(MainHandler):
+  #posteos hechos en feed
   def post(self):
     postdb=db.GqlQuery("SELECT * FROM Post "
                           "ORDER BY fecha DESC LIMIT 4")
     private=db.GqlQuery("SELECT * FROM Privatepost "
                           "ORDER BY user DESC")
-    user=self.getP("user")
-      
+    
     for post in postdb: 
-      i=0
+      i=0 
+      user=self.getP("user")
       for p in private:
         if p.keysid==post.num and post.user2==user:
           i=1
           image="/images/hide.png"
           function="publicpost(user, id)"
           self.render("post.php", user=post.user2, keysid=post.num, text=post.text, fecha=str(post.fecha), url=post.urll, image=image, function=function)
-        elif p.keysid==post.num and post.user2!=user:
+        if p.keysid==post.num and user=="None":
           i=3
-        elif p.keysid!=post.num and post.user2!=user:  
-          i=2
-          
-
-      if i==0:
+      if user!="None" and i==0:
         image="/images/show.png"
         function="privatepost(user, id)"
         self.render("post.php", user=post.user2, keysid=post.num, text=post.text, fecha=str(post.fecha), url=post.urll, image=image, function=function)
-      if i==2:
+      elif user=="None" and i==0:
         image="/images/public.png"
         function=""
         self.render("post.php", user=post.user2, keysid=post.num, text=post.text, fecha=str(post.fecha), url=post.urll, image=image, function=function)
 
-      
-      
+class Posteos2(MainHandler):
+  #todos los posteos hechos 
+  def post(self):
+    postdb=db.GqlQuery("SELECT * FROM Post "
+                          "ORDER BY fecha DESC")
+    private=db.GqlQuery("SELECT * FROM Privatepost "
+                          "ORDER BY user DESC")
+    
+    for post in postdb: 
+      i=0 
+      user=self.getP("user")
+      for p in private:
+        if p.keysid==post.num and post.user2==user:
+          i=1
+          image="/images/hide.png"
+          function="publicpost(user, id)"
+          self.render("post.php", user=post.user2, keysid=post.num, text=post.text, fecha=str(post.fecha), url=post.urll, image=image, function=function)
+        if p.keysid==post.num and user=="None":
+          i=3
+      if user!="None" and i==0:
+        image="/images/show.png"
+        function="privatepost(user, id)"
+        self.render("post.php", user=post.user2, keysid=post.num, text=post.text, fecha=str(post.fecha), url=post.urll, image=image, function=function)
+      elif user=="None" and i==0:
+        image="/images/public.png"
+        function=""
+        self.render("post.php", user=post.user2, keysid=post.num, text=post.text, fecha=str(post.fecha), url=post.urll, image=image, function=function)
+
 
 class Session(MainHandler):
   def create_session(self, pword, name, user):
@@ -341,6 +365,7 @@ app = webapp2.WSGIApplication([
     ("/content/.json", Json),
     ("/posteados/post", Posteados),
     ("/posteos", Posteos),
+    ("/posteos2", Posteos2),
     ("/eliminar/deletepost", Deletepost),
     ("/eliminar/deletecomment", Deletecomment),
     ("/private/post", Privatespost),
