@@ -30,7 +30,7 @@ class Post(db.Model):
   user2=db.StringProperty(required = False)
   urll=db.StringProperty(required = False)
   num=db.StringProperty(required = False)
-  categoria=db.IntegerProperty(int)
+  categoria=db.TextProperty(required = False)
 
 class Comment(db.Model):
   fecha=db.DateTimeProperty(auto_now_add = True)
@@ -69,13 +69,13 @@ class MainHandler(Handler):
         #db.delete(Privatepost.all(keys_only=True))
 
     def validar(self):
-      a=self.get_cookies("user_id")
-      if a:
-        a=self.check_secure_val(a)
-        for d in self.logindb():
-          s=str(d.key().id())
-          if s==a:
-            return d.user.title()
+      user_id=self.get_cookies("user_id")
+      if user_id:
+        user_id=self.check_secure_val(user_id)
+        for login in self.logindb():
+          keysid=str(login.key().id())
+          if keysid==user_id:
+            return login.user.title()
             break
 
     def reg(self, pword, name, user):
@@ -124,19 +124,20 @@ class MainHandler(Handler):
     def getP(self, post):
       return self.request.get(post)
 
+    def start_secret(self, pword):
+      pword=self.hash_keys(pword)
+      pword=self.secret(pword)
+      return pword
 
     def post(self):
       user=self.getP("userreg")
       pword=self.getP("passreg")
       name=self.getP("nombre")
-      pub=self.getP("text")
-      num=self.getP("comentar")
+      id_comentario=self.getP("comentar")
       if user and pword and name:
         self.reg(pword, name, user)
-      elif pub:
-        self.postt(pub)
-      elif num:
-        self.commentar(num)
+      elif id_comentario:
+        self.commentar(id_comentario)
       else:
         user=self.getP("user")
         pword=self.getP("pass")
@@ -152,19 +153,39 @@ class MainHandler(Handler):
     #def count(self, n):
      # num=Post.all().filter("")
 
-    def postt(self, text):
+class Search(MainHandler):
+  def get(self):
+    postdb=db.GqlQuery("SELECT * FROM Post "
+                          "ORDER BY fecha DESC")
+    text=self.getP("text").split(" ")
+    i=0
+    for post in postdb:
+      tag=post.categoria.split(",")
+      for tx in text:
+        for t in tag:
+          if tx==t:
+            i=1
+            image="/images/public.png"
+            function=""
+            self.render("post.php", user=post.user2, keysid=post.num, text=post.text, fecha=str(post.fecha), url=post.urll, image=image, function=function)
+    if i==0:
+      self.write("No esta, Estas son las tags disponibles hasta ahora:")
+      for t in tag:
+        self.write(t+", ")
+      
+
+
+class Publicar(MainHandler):
+  def post(self):
       user=self.getP("user")
-      tag=1
+      tags=self.getP("tags")
+      text=self.getP("text")
       salt=self.salts()
-      r=Post(text = text, user2=user, urll="/000", num=salt, categoria=tag)
+      image="/images/public.png"
+      function=""
+      r=Post(text = text, user2=user, urll="/000", num=salt, categoria=tags)
       r.put()
-      self.redirect("pub")
-
-    def start_secret(self, pword):
-      pword=self.hash_keys(pword)
-      pword=self.secret(pword)
-      return pword
-
+      
 class Posteados(MainHandler):
   #sacando informacion de privacidad en posts
   def get(self):
@@ -283,9 +304,9 @@ class Url(MainHandler):
       self.render("url.html", data=data, user=user, url=url)
 
  def post(self, url):
-  a=self.getP("text")
+  text=self.getP("text")
   user=self.getP("user")
-  d=Post(text=a, user2=user, urll=url)
+  d=Post(text=text, user2=user, urll=url)
   d.put()
   self.render("loading2.html")
 
@@ -362,6 +383,8 @@ app = webapp2.WSGIApplication([
     ('/token=login', Login),
     ('/logout', Logout),
     ('/pub', Pub),
+    ('/publicar', Publicar),
+    ('/buscar', Search),
     ("/content/.json", Json),
     ("/posteados/post", Posteados),
     ("/posteos", Posteos),

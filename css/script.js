@@ -1,10 +1,43 @@
 $(document).ready(function() {
     elementosocultos();
     graphic();
+    $(".content form").submit(function(){
+        var tags=$(".tags").val()
+        var user=$(".content form input").val();
+        var text=$(".content form textarea").val();
+        var url="/publicar?user="+user+"&tags="+tags+",&text="+text+"";
+        $.post(url, function(e){
+            location.href="pub"
+        }).fail(function(){
+            alert("fallo al publicar")
+        })
+        return false
+    });
+    $("#buscar").submit(function(){
+        var buscar=$("#buscar input").val()
+        if(buscar==""){
+            alert("El campo esta vacio")
+        }else{
+            var url="/buscar?text="+buscar+"";
+            $("#content2").css({"-webkit-filter": "blur(3px)","filter": "blur(3px)" }),$("#content").css("display", "block"),$(".bestcomment").css("display", "block"),$(".bestcomment").html("")
+            $.get(url, function(e){
+                $(".bestcomment").html("<center style='cursor:pointer'>"+e+"</center>")
+            });
+        }
+        return false 
+    })
 });
-
+function teclado(event){
+    var x = event.keyCode;
+    if(13==x){
+        var caracter=$(".tags").val()
+        caracter=caracter.replace(" ","")
+        $(".tags").val(""+caracter+", ")
+    }
+}
 function postall(user){
     var url="/posteos2?user="+user+""
+    $(".bestcomment").html("")
     $("#content2").css({
             "-webkit-filter": "blur(3px)",
             "filter": "blur(3px)"

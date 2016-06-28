@@ -1,8 +1,5 @@
 *{padding: 0;margin:0;}
-
-
 body{background:#f2f2f2}
-
 
 #logo{position:fixed;top:0;background:#FF0040;width:99.9%;height:50px;}
 #logo h1{position: absolute;left:5%;top:10px;font-size:25px;color:#fff;cursor:pointer;}
@@ -10,6 +7,10 @@ body{background:#f2f2f2}
 #logo div{position: absolute;right:5%;}
 #logo div b{position: relative;margin-right:5px;top:15px;font-size:18px;font-weight: lighter;color:#fff;opacity: 0.9;cursor: pointer;}
 #logo div b:hover{text-decoration:underline;}
+#logo form{position:absolute;left:20%;top:10px;}
+#logo form input{width:200px;height:30px;font-size:16px;text-indent:5px}
+#logo form button{border:0;background:#DF013A;color:#fff;width:100px;height:30px;font-size:16px}
+#logo form input:focus{outline: none;border:groove 1px;border-color:red;}
 
 #logo2{position:fixed;top:0;background:#000000;width:99.9%;height:50px;}
 #logo2 h1{position: absolute;left:5%;top:10px;font-size:25px;color:#fff;cursor:pointer;}

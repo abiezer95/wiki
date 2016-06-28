@@ -20,8 +20,10 @@ $(document).ready(function(){
 			<option value="familia">Familia</option>
 			<option value="amor">Amor</option>
 			<option value="Ocio" selected>Ocio</option>
-		</select>
-		<input type="hidden" name="user" value={{user}}><br><br><button>Postear</button></form><br><button  onclick='$("#limpiar").val("");$("#limpiar").focus();'>Limpiar todo</button>
+		</select><input type="hidden" name="user" value={{user}}><br><br><button>Postear</button></form><br><button  onclick='$("#limpiar").val("");$("#limpiar").focus();'>Limpiar todo</button>
+		<br><br>
+		<label>Etiquetas: </label><input type="text" name="tags" placeholder="Ej. amor" style="width:400px;height:30px;font-size:16px;text-indent:5px;outline:none" class="tags" onkeydown="teclado(event)">
+
 	{% else %}
 		<h2>No puedes publicar</h2>
 		<p>inicia sesion para hacerlo</p>
@@ -33,9 +35,8 @@ $(document).ready(function(){
 <button style='position:relative;top:10px;border:0;background:#FF0040;color:#fff;font-size:16px;border-radius:5px' onclick="var user='{{user}}';postall(user)">Ver todo</button>
 <div class="graphic">
 	<center>
-		<button onclick="bestcomment()">posts más comentados</button>
 		<button>Grafico de barra</button>
-		<input type="hidden" value="">
+		<input type="hidden" value="20,150,10,200">
 	</center>
 
 	<div class="graficos">
@@ -77,6 +78,10 @@ $(document).ready(function(){
 			<a href="logout" style="color:red;"><b>Logout</b></a>
 		{% endif %}
 		</div>
+		<form method="post" id="buscar">
+			<input type="text" name="search">
+			<button>Buscar</button>
+		</form>
 	</div>
 </div>
 	<footer>
