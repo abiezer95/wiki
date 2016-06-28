@@ -113,7 +113,7 @@ function post(p, user, id) {
                 "height": "400px",
                 "left": "30%"
             }),
-            $(".load").html(pub);
+        $(".load").html(pub);
         $(".id").val(id)
         clearInterval(inter);
     }, 2000);
